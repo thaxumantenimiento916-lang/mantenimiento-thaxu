@@ -141,7 +141,7 @@
         <label>Foto de evidencia de la solución</label>
         <label class="photo-input-mini" id="photoMini-${aviso.Folio}">
           Toca para tomar o subir la foto
-          <input type="file" accept="image/*" capture="environment" multiple>
+          <input type="file" accept="image/*" multiple>
         </label>
         <div class="confirm-preview" id="preview-${aviso.Folio}"></div>
       ` : ""}
@@ -258,7 +258,7 @@
     const quality = (window.CONFIG && CONFIG.PHOTO_QUALITY) || 0.75;
 
     if (window.createImageBitmap) {
-      return createImageBitmap(file, { resizeWidth: maxW, resizeQuality: "medium" })
+      return createImageBitmap(file, { resizeWidth: maxW, resizeQuality: "low" })
         .then((bitmap) => {
           const canvas = document.createElement("canvas");
           canvas.width = bitmap.width;
@@ -266,12 +266,28 @@
           const ctx = canvas.getContext("2d");
           ctx.drawImage(bitmap, 0, 0);
           if (bitmap.close) bitmap.close();
-          return canvas.toDataURL("image/jpeg", quality);
+          return canvasABase64(canvas, quality);
         })
         .catch(() => comprimirImagenFallback(file, maxW, quality));
     }
 
     return comprimirImagenFallback(file, maxW, quality);
+  }
+
+  function canvasABase64(canvas, quality) {
+    return new Promise((resolve, reject) => {
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) { reject(new Error("No se pudo comprimir la imagen")); return; }
+          const reader = new FileReader();
+          reader.onerror = () => reject(new Error("No se pudo leer la imagen comprimida"));
+          reader.onload = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        },
+        "image/jpeg",
+        quality
+      );
+    });
   }
 
   function comprimirImagenFallback(file, maxW, quality) {
@@ -288,7 +304,7 @@
           canvas.height = img.height * scale;
           const ctx = canvas.getContext("2d");
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          resolve(canvas.toDataURL("image/jpeg", quality));
+          canvasABase64(canvas, quality).then(resolve).catch(reject);
         };
         img.src = e.target.result;
       };
