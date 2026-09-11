@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aviso de Mantenimiento Correctivo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="letterhead">
+  <img src="logo.png" alt="ThaXu Import & Export">
+  <div class="letterhead-text">
+    <strong>ThaXu Import &amp; Export</strong>
+    <span>Área: Mantenimiento</span>
+  </div>
+</div>
+
+<nav class="navbar">
+  <a href="index.html" class="active">Registrar aviso</a>
+  <a href="visualizador.html">Ver avisos</a>
+</nav>
+
+<div class="plate">
+  <div class="plate-top">
+    <div>
+      <h1>Aviso de mantenimiento correctivo</h1>
+    </div>
+    <div class="folio">
+      <span>Folio</span>
+      <span id="folioValue">—</span>
+      <span style="margin-top:6px;">Fecha</span>
+      <span id="fechaValue">—</span>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div id="configWarning" class="config-warning" style="display:none;">
+    ⚠️ Falta configurar la URL del flujo de Power Automate en <code>config.js</code>. El formulario no podrá enviarse hasta que esté configurada.
+  </div>
+
+  <form id="avisoForm">
+
+    <div class="section">
+      <div class="section-title"><span class="section-num">1</span><h2>Solicitante</h2></div>
+
+      <label for="nombreSolicitante" class="req">Solicitante (Nombre y apellido)</label>
+      <input type="text" id="nombreSolicitante" required autocomplete="name">
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="section-num">2</span><h2>Técnico</h2></div>
+
+      <label class="req">Especialidad</label>
+      <div class="radio-group" id="especialidadGroup">
+        <div class="radio-chip"><input type="radio" name="especialidad" id="esp1" value="Electricista" required><label for="esp1">Electricista</label></div>
+        <div class="radio-chip"><input type="radio" name="especialidad" id="esp2" value="Frigorista"><label for="esp2">Frigorista</label></div>
+        <div class="radio-chip"><input type="radio" name="especialidad" id="esp3" value="Mecánico"><label for="esp3">Mecánico</label></div>
+        <div class="radio-chip"><input type="radio" name="especialidad" id="esp4" value="Calderista"><label for="esp4">Calderista</label></div>
+        <div class="radio-chip"><input type="radio" name="especialidad" id="esp5" value="Albañil"><label for="esp5">Albañil</label></div>
+        <div class="radio-chip"><input type="radio" name="especialidad" id="esp6" value="Soldador"><label for="esp6">Soldador</label></div>
+        <div class="radio-chip"><input type="radio" name="especialidad" id="esp7" value="Otro"><label for="esp7">Otro</label></div>
+      </div>
+      <input type="text" id="especialidadOtro" placeholder="Especifica la especialidad" style="display:none;margin-top:10px;">
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="section-num">3</span><h2>Ubicación</h2></div>
+
+      <label for="lugar" class="req">Lugar</label>
+      <select id="lugar" required>
+        <option value="" disabled selected>Selecciona un lugar…</option>
+        <option>Garita</option>
+        <option>Oficina administrativa 1er piso</option>
+        <option>Oficina de comercio exterior</option>
+        <option>Oficina administrativa 2do piso</option>
+        <option>Oficina de administración y finanzas</option>
+        <option>Oficina de logística</option>
+        <option>Oficina de producción</option>
+        <option>Almacén general</option>
+        <option>Comedor</option>
+        <option>Sala de máquinas - Zona alta</option>
+        <option>Sala de máquinas 1</option>
+        <option>Sala de máquinas 2</option>
+        <option>Zona de ingreso a planta</option>
+        <option>Zona de empaque</option>
+        <option>Zona de envasado de productos cocidos</option>
+        <option>Área de perfilado</option>
+        <option>Zona de cocina de planta</option>
+        <option>Productor de hielo</option>
+        <option>Laminado</option>
+        <option>Zona de envasado fresco</option>
+        <option>Zona de lavado</option>
+        <option>Zona de fileteo</option>
+        <option>Zona de recepción</option>
+        <option>Área temporal de residuos sólidos</option>
+        <option>Túnel 1</option>
+        <option>Túnel 2</option>
+        <option>Túnel 3</option>
+        <option>Cámara 1</option>
+        <option>Cámara 2</option>
+        <option>Cámara 3</option>
+        <option>Zona de pasadizo de cámaras</option>
+        <option>Precámara</option>
+        <option>Tópico</option>
+        <option>Baño general de hombres</option>
+        <option>Baño general de mujeres</option>
+        <option>Vestidor de hombres</option>
+        <option>Vestidor de mujeres</option>
+        <option value="__otro__">Otros lugares (especificar)</option>
+      </select>
+      <input type="text" id="lugarOtro" placeholder="Especifica el lugar" style="display:none;margin-top:10px;">
+    </div>
+
+    <div class="section">
+      <div class="section-title"><span class="section-num">4</span><h2>Descripción del problema</h2></div>
+
+      <div class="row2">
+        <div>
+          <label class="req">Tipo de mantenimiento</label>
+          <select id="tipoMantenimiento" required>
+            <option value="Correctivo" selected>Correctivo</option>
+            <option value="Preventivo">Preventivo</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+        <div>
+          <label class="req">Prioridad</label>
+          <select id="prioridad" required>
+            <option value="Media" selected>Media</option>
+            <option value="Baja">Baja</option>
+            <option value="Alta">Alta</option>
+            <option value="Urgente">Urgente</option>
+          </select>
+        </div>
+      </div>
+
+      <label for="descripcion" class="req">Descripción de la falla</label>
+      <textarea id="descripcion" required placeholder="Ej: El breaker principal de la cámara 2 se dispara al arrancar el compresor…"></textarea>
+
+      <label for="fecha" class="req">Fecha del reporte</label>
+      <input type="date" id="fecha" required>
+    </div>
+
+    <div class="section evidencia">
+      <div class="section-title"><span class="section-num">5</span><h2>Evidencia fotográfica</h2></div>
+
+      <label class="photo-input" id="photoLabel">
+        <div class="icon">📷</div>
+        <div><strong>Tomar o subir fotos</strong></div>
+        <div class="hint">Puedes agregar varias fotos del problema</div>
+        <input type="file" id="fotos" accept="image/*" capture="environment" multiple>
+      </label>
+
+      <div id="previewGrid"></div>
+    </div>
+
+    <div class="submit-bar">
+      <button type="submit" class="submit" id="submitBtn">Enviar aviso</button>
+    </div>
+    <div class="status" id="statusMsg"></div>
+  </form>
+</main>
+
+<script src="config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

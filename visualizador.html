@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visualizador de Avisos — Mantenimiento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="letterhead">
+  <img src="logo.png" alt="ThaXu Import & Export">
+  <div class="letterhead-text">
+    <strong>ThaXu Import &amp; Export</strong>
+    <span>Área: Mantenimiento</span>
+  </div>
+</div>
+
+<nav class="navbar">
+  <a href="index.html">Registrar aviso</a>
+  <a href="visualizador.html" class="active">Ver avisos</a>
+</nav>
+
+<div class="plate">
+  <div class="plate-top">
+    <div>
+      <h1>Visualizador de avisos</h1>
+      <p>Estado de los mantenimientos correctivos registrados</p>
+    </div>
+  </div>
+</div>
+
+<main style="padding-top:0;">
+  <div id="configWarning" class="config-warning" style="display:none;margin-top:16px;">
+    ⚠️ Falta configurar las URLs de los flujos de Power Automate (lectura/actualización) en <code>config.js</code>.
+  </div>
+</main>
+
+<div class="filter-tabs" id="filterTabs">
+  <button type="button" class="filter-tab active" data-filter="todos">Todos</button>
+  <button type="button" class="filter-tab" data-filter="pendiente">Pendientes</button>
+  <button type="button" class="filter-tab" data-filter="resuelto">Resueltos</button>
+</div>
+<div class="filter-count" id="filterCount"></div>
+
+<div id="listaAvisos">
+  <div class="loading-state" id="loadingState">Cargando avisos…</div>
+</div>
+
+<script src="config.js"></script>
+<script src="visualizador.js"></script>
+</body>
+</html>
