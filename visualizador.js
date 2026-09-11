@@ -254,6 +254,27 @@
 
   // ---------- Compresión de imágenes (evidencia) ----------
   function comprimirImagen(file) {
+    const maxW = (window.CONFIG && CONFIG.MAX_PHOTO_WIDTH) || 1280;
+    const quality = (window.CONFIG && CONFIG.PHOTO_QUALITY) || 0.75;
+
+    if (window.createImageBitmap) {
+      return createImageBitmap(file, { resizeWidth: maxW, resizeQuality: "medium" })
+        .then((bitmap) => {
+          const canvas = document.createElement("canvas");
+          canvas.width = bitmap.width;
+          canvas.height = bitmap.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(bitmap, 0, 0);
+          if (bitmap.close) bitmap.close();
+          return canvas.toDataURL("image/jpeg", quality);
+        })
+        .catch(() => comprimirImagenFallback(file, maxW, quality));
+    }
+
+    return comprimirImagenFallback(file, maxW, quality);
+  }
+
+  function comprimirImagenFallback(file, maxW, quality) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onerror = () => reject(new Error("No se pudo leer la imagen"));
@@ -261,14 +282,12 @@
         const img = new Image();
         img.onerror = () => reject(new Error("No se pudo procesar la imagen"));
         img.onload = () => {
-          const maxW = (window.CONFIG && CONFIG.MAX_PHOTO_WIDTH) || 1280;
           const scale = Math.min(1, maxW / img.width);
           const canvas = document.createElement("canvas");
           canvas.width = img.width * scale;
           canvas.height = img.height * scale;
           const ctx = canvas.getContext("2d");
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          const quality = (window.CONFIG && CONFIG.PHOTO_QUALITY) || 0.75;
           resolve(canvas.toDataURL("image/jpeg", quality));
         };
         img.src = e.target.result;
