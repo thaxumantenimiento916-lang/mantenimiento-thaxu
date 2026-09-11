@@ -6,7 +6,7 @@
 // Implementar → Nueva implementación → Aplicación web.
 // ==========================================================
 
-const CONFIG = {
+window.CONFIG = {
   APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxTusNWKhZv4aAw5lO8gFC-pd3NanbA2Cl8zCb1Pxwfz2IE2OcoUa2Y-y61lz6YHz117A/exec",
 
   // Ancho máximo (px) al que se redimensionan las fotos antes
