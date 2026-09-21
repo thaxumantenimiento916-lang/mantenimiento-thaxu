@@ -639,3 +639,22 @@
   cursor:pointer;
   border-radius:2px;
 }
+
+/* ---------- Botón de compartir por WhatsApp ---------- */
+.btn-whatsapp{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  max-width:640px;
+  margin:12px auto 0;
+  padding:13px;
+  background:#25D366;
+  color:#fff;
+  font-weight:600;
+  font-size:0.95rem;
+  text-decoration:none;
+  border-radius:2px;
+  text-align:center;
+}
+.btn-whatsapp:active{background:#1ebc59;}

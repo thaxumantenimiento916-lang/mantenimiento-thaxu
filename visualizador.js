@@ -5,7 +5,6 @@
   const loadingState = document.getElementById("loadingState");
   const filterCount = document.getElementById("filterCount");
   const configWarning = document.getElementById("configWarning");
-  const dashboard = document.getElementById("dashboard");
   const tecnicoFilter = document.getElementById("tecnicoFilter");
   const fechaDesde = document.getElementById("fechaDesde");
   const fechaHasta = document.getElementById("fechaHasta");
@@ -18,8 +17,6 @@
   let avisos = [];
   let filtroActivo = "todos";
   let tecnicosActivos = []; // vacío = sin filtrar por técnico
-  let chartEstado = null;
-  let chartTecnicos = null;
 
   // ---------- Filtro de estado (desglosable) ----------
   document.querySelectorAll('input[name="filtroEstado"]').forEach((radio) => {
@@ -51,10 +48,8 @@
   });
 
   // ---------- Filtro de fecha ----------
-  // "Desde" arranca en el día de hoy (se ve lo que ocurre desde hoy en
-  // adelante); "Hasta" queda libre para ver historial completo con el
-  // botón "Limpiar fechas".
-  fechaDesde.value = new Date().toISOString().split("T")[0];
+  // Sin valor por defecto: al cargar se ve el historial completo, sin
+  // que la fecha oculte avisos hasta que el usuario elija filtrar.
 
   fechaDesde.addEventListener("change", renderLista);
   fechaHasta.addEventListener("change", renderLista);
@@ -87,7 +82,6 @@
       const cacheado = localStorage.getItem(LOCAL_CACHE_KEY);
       if (cacheado) {
         avisos = JSON.parse(cacheado);
-        renderDashboard();
         renderLista();
       }
     } catch (err) {
@@ -105,7 +99,6 @@
       avisos = avisos.map((a) => ({ ...a, Estado: a.Estado || "Pendiente" }));
       avisos.sort((a, b) => (b.Folio || "").localeCompare(a.Folio || ""));
 
-      renderDashboard();
       renderLista();
 
       try {
@@ -141,47 +134,6 @@
     if (fechaHasta.value) lista = lista.filter((a) => (a.Fecha || "") <= fechaHasta.value);
 
     return lista;
-  }
-
-  // ---------- Dashboard: 2 gráficos con todos los avisos ----------
-  function renderDashboard() {
-    if (avisos.length === 0) return;
-    dashboard.style.display = "grid";
-
-    const pendientes = avisos.filter((a) => a.Estado !== "Resuelto").length;
-    const resueltos = avisos.filter((a) => a.Estado === "Resuelto").length;
-
-    const conteoTecnicos = TECNICOS.map((nombre) =>
-      avisos.filter((a) => (a.Especialidad || "").split(",").map((n) => n.trim()).includes(nombre)).length
-    );
-
-    if (chartEstado) chartEstado.destroy();
-    chartEstado = new Chart(document.getElementById("chartEstado"), {
-      type: "pie",
-      data: {
-        labels: ["Pendientes", "Resueltos"],
-        datasets: [{ data: [pendientes, resueltos], backgroundColor: ["#c98600", "#2e7d4f"] }]
-      },
-      options: {
-        maintainAspectRatio: false,
-        plugins: { legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 11 } } } }
-      }
-    });
-
-    if (chartTecnicos) chartTecnicos.destroy();
-    chartTecnicos = new Chart(document.getElementById("chartTecnicos"), {
-      type: "bar",
-      data: {
-        labels: TECNICOS,
-        datasets: [{ data: conteoTecnicos, backgroundColor: "#3a5a73" }]
-      },
-      options: {
-        indexAxis: "y",
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: { x: { ticks: { precision: 0 } } }
-      }
-    });
   }
 
   // ---------- Render lista ----------
@@ -363,7 +315,6 @@
         panel.style.display = "none";
         panel.innerHTML = "";
         renderLista();
-        renderDashboard();
 
         try {
           localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(avisos));

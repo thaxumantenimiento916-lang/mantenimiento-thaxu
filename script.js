@@ -3,6 +3,7 @@
 
   const form = document.getElementById("avisoForm");
   const statusMsg = document.getElementById("statusMsg");
+  const whatsappBtn = document.getElementById("whatsappBtn");
   const submitBtn = document.getElementById("submitBtn");
   const folioValue = document.getElementById("folioValue");
   const fechaValue = document.getElementById("fechaValue");
@@ -275,11 +276,39 @@
     fotosInput.value = ""; // permite volver a elegir/repetir archivos
   });
 
+  // ---------- Mensaje de WhatsApp ----------
+  function construirLinkWhatsApp(datos, fotos) {
+    const lineas = [
+      "*Aviso de Mantenimiento Correctivo*",
+      `Folio: ${datos.folio}`,
+      `Fecha: ${datos.fecha}`,
+      `Área solicitante: ${datos.solicitante}`,
+      `Técnico(s): ${datos.especialidad}`,
+      `Lugar: ${datos.lugar}`,
+      `Tipo de mantenimiento: ${datos.tipoMantenimiento}`,
+      `Prioridad: ${datos.prioridad}`,
+      "",
+      `Descripción: ${datos.descripcion}`
+    ];
+
+    lineas.push("");
+    if (fotos.length > 0) {
+      lineas.push(fotos.length === 1 ? "Foto:" : "Fotos:");
+      fotos.forEach((url) => lineas.push(url));
+    } else {
+      lineas.push("Foto: sin foto");
+    }
+
+    const texto = encodeURIComponent(lineas.join("\n"));
+    return `https://wa.me/?text=${texto}`;
+  }
+
   // ---------- Envío ----------
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     statusMsg.textContent = "";
     statusMsg.className = "status";
+    whatsappBtn.style.display = "none";
 
     if (!window.CONFIG || !CONFIG.APPS_SCRIPT_URL || CONFIG.APPS_SCRIPT_URL.includes("PEGA_AQUI")) {
       statusMsg.textContent = "No se puede enviar: falta configurar la URL del flujo en config.js.";
@@ -337,6 +366,10 @@
 
       statusMsg.textContent = `Aviso ${folio} enviado correctamente.`;
       statusMsg.className = "status ok";
+
+      whatsappBtn.href = construirLinkWhatsApp(payload, data.fotos || []);
+      whatsappBtn.style.display = "flex";
+
       form.reset();
       fotosSeleccionadas = [];
       renderPreviews();
