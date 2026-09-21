@@ -6,9 +6,48 @@
   const filterTabs = document.getElementById("filterTabs");
   const filterCount = document.getElementById("filterCount");
   const configWarning = document.getElementById("configWarning");
+  const dashboard = document.getElementById("dashboard");
+  const tecnicoFilter = document.getElementById("tecnicoFilter");
+  const fechaDesde = document.getElementById("fechaDesde");
+  const fechaHasta = document.getElementById("fechaHasta");
+  const limpiarFechas = document.getElementById("limpiarFechas");
+
+  const TECNICOS = ["Cristhian", "Ismael", "Jaime", "Pablo", "Mauricio", "Viera", "Gian Franco", "Andy", "Victor"];
 
   let avisos = [];
   let filtroActivo = "todos";
+  let tecnicosActivos = []; // vacío = sin filtrar por técnico
+  let chartEstado = null;
+  let chartTecnicos = null;
+
+  // ---------- Filtro de técnico: construir los chips ----------
+  TECNICOS.forEach((nombre) => {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "tecnico-chip";
+    chip.textContent = nombre;
+    chip.dataset.tecnico = nombre;
+    chip.addEventListener("click", () => {
+      if (tecnicosActivos.includes(nombre)) {
+        tecnicosActivos = tecnicosActivos.filter((t) => t !== nombre);
+        chip.classList.remove("active");
+      } else {
+        tecnicosActivos.push(nombre);
+        chip.classList.add("active");
+      }
+      renderLista();
+    });
+    tecnicoFilter.appendChild(chip);
+  });
+
+  // ---------- Filtro de fecha ----------
+  fechaDesde.addEventListener("change", renderLista);
+  fechaHasta.addEventListener("change", renderLista);
+  limpiarFechas.addEventListener("click", () => {
+    fechaDesde.value = "";
+    fechaHasta.value = "";
+    renderLista();
+  });
 
   // ---------- Validación de configuración ----------
   const faltaConfig =
@@ -22,7 +61,7 @@
     cargarAvisos();
   }
 
-  // ---------- Cargar avisos desde Power Automate ----------
+  // ---------- Cargar avisos desde Apps Script ----------
   async function cargarAvisos() {
     try {
       const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=listar`, { method: "GET" });
@@ -35,11 +74,12 @@
       avisos = avisos.map((a) => ({ ...a, Estado: a.Estado || "Pendiente" }));
       avisos.sort((a, b) => (b.Folio || "").localeCompare(a.Folio || ""));
 
+      renderDashboard();
       renderLista();
     } catch (err) {
       console.error(err);
       loadingState.textContent =
-        "No se pudo cargar la lista de avisos. Revisa tu conexión o el flujo de Power Automate.";
+        "No se pudo cargar la lista de avisos. Revisa tu conexión o el proyecto de Apps Script.";
     }
   }
 
@@ -54,9 +94,59 @@
   });
 
   function avisosFiltrados() {
-    if (filtroActivo === "pendiente") return avisos.filter((a) => a.Estado !== "Resuelto");
-    if (filtroActivo === "resuelto") return avisos.filter((a) => a.Estado === "Resuelto");
-    return avisos;
+    let lista = avisos;
+
+    if (filtroActivo === "pendiente") lista = lista.filter((a) => a.Estado !== "Resuelto");
+    if (filtroActivo === "resuelto") lista = lista.filter((a) => a.Estado === "Resuelto");
+
+    if (tecnicosActivos.length > 0) {
+      lista = lista.filter((a) => {
+        const nombresAviso = (a.Especialidad || "").split(",").map((n) => n.trim());
+        return tecnicosActivos.some((t) => nombresAviso.includes(t));
+      });
+    }
+
+    if (fechaDesde.value) lista = lista.filter((a) => (a.Fecha || "") >= fechaDesde.value);
+    if (fechaHasta.value) lista = lista.filter((a) => (a.Fecha || "") <= fechaHasta.value);
+
+    return lista;
+  }
+
+  // ---------- Dashboard: 2 gráficos con todos los avisos ----------
+  function renderDashboard() {
+    if (avisos.length === 0) return;
+    dashboard.style.display = "grid";
+
+    const pendientes = avisos.filter((a) => a.Estado !== "Resuelto").length;
+    const resueltos = avisos.filter((a) => a.Estado === "Resuelto").length;
+
+    const conteoTecnicos = TECNICOS.map((nombre) =>
+      avisos.filter((a) => (a.Especialidad || "").split(",").map((n) => n.trim()).includes(nombre)).length
+    );
+
+    if (chartEstado) chartEstado.destroy();
+    chartEstado = new Chart(document.getElementById("chartEstado"), {
+      type: "pie",
+      data: {
+        labels: ["Pendientes", "Resueltos"],
+        datasets: [{ data: [pendientes, resueltos], backgroundColor: ["#c98600", "#2e7d4f"] }]
+      },
+      options: { plugins: { legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 11 } } } } }
+    });
+
+    if (chartTecnicos) chartTecnicos.destroy();
+    chartTecnicos = new Chart(document.getElementById("chartTecnicos"), {
+      type: "bar",
+      data: {
+        labels: TECNICOS,
+        datasets: [{ data: conteoTecnicos, backgroundColor: "#3a5a73" }]
+      },
+      options: {
+        indexAxis: "y",
+        plugins: { legend: { display: false } },
+        scales: { x: { ticks: { precision: 0 } } }
+      }
+    });
   }
 
   // ---------- Render lista ----------
@@ -103,7 +193,7 @@
       </div>
       <div class="aviso-meta">
         <span><b>Solicitante:</b> ${aviso.Solicitante || "—"}</span>
-        <span><b>Especialidad:</b> ${aviso.Especialidad || "—"}</span>
+        <span><b>Técnico(s):</b> ${aviso.Especialidad || "—"}</span>
         <span><b>Tipo:</b> ${aviso.TipoMantenimiento || "—"}</span>
         <span><b>Prioridad:</b> ${aviso.Prioridad || "—"}</span>
       </div>

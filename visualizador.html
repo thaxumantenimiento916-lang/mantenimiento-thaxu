@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -38,11 +39,33 @@
   </div>
 </main>
 
+<div class="dashboard" id="dashboard" style="display:none;">
+  <div class="chart-card">
+    <h3>Avisos por estado</h3>
+    <canvas id="chartEstado"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>Avisos por técnico</h3>
+    <canvas id="chartTecnicos"></canvas>
+  </div>
+</div>
+
 <div class="filter-tabs" id="filterTabs">
   <button type="button" class="filter-tab active" data-filter="todos">Todos</button>
   <button type="button" class="filter-tab" data-filter="pendiente">Pendientes</button>
   <button type="button" class="filter-tab" data-filter="resuelto">Resueltos</button>
 </div>
+
+<div class="tecnico-filter" id="tecnicoFilter"></div>
+
+<div class="fecha-filter">
+  <label for="fechaDesde">Desde</label>
+  <input type="date" id="fechaDesde">
+  <label for="fechaHasta">Hasta</label>
+  <input type="date" id="fechaHasta">
+  <button type="button" id="limpiarFechas">Limpiar fechas</button>
+</div>
+
 <div class="filter-count" id="filterCount"></div>
 
 <div id="listaAvisos">

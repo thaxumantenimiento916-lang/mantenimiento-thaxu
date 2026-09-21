@@ -47,71 +47,48 @@
     <div class="section">
       <div class="section-title"><span class="section-num">1</span><h2>Solicitante</h2></div>
 
-      <label for="nombreSolicitante" class="req">Solicitante (Nombre y apellido)</label>
-      <input type="text" id="nombreSolicitante" required autocomplete="name">
+      <label for="areaSolicitante" class="req">Área solicitante</label>
+      <select id="areaSolicitante" required>
+        <option value="" disabled selected>Selecciona un área…</option>
+        <option>Producción</option>
+        <option>Mantenimiento</option>
+        <option>Garita</option>
+        <option>Comex</option>
+        <option>Gerencia</option>
+        <option>Logística</option>
+        <option value="__otro__">Otro (especificar)</option>
+      </select>
+      <input type="text" id="areaSolicitanteOtro" placeholder="Especifica el área" style="display:none;margin-top:10px;">
     </div>
 
     <div class="section">
       <div class="section-title"><span class="section-num">2</span><h2>Técnico</h2></div>
 
-      <label class="req">Especialidad</label>
-      <div class="radio-group" id="especialidadGroup">
-        <div class="radio-chip"><input type="radio" name="especialidad" id="esp1" value="Electricista" required><label for="esp1">Electricista</label></div>
-        <div class="radio-chip"><input type="radio" name="especialidad" id="esp2" value="Frigorista"><label for="esp2">Frigorista</label></div>
-        <div class="radio-chip"><input type="radio" name="especialidad" id="esp3" value="Mecánico"><label for="esp3">Mecánico</label></div>
-        <div class="radio-chip"><input type="radio" name="especialidad" id="esp4" value="Calderista"><label for="esp4">Calderista</label></div>
-        <div class="radio-chip"><input type="radio" name="especialidad" id="esp5" value="Albañil"><label for="esp5">Albañil</label></div>
-        <div class="radio-chip"><input type="radio" name="especialidad" id="esp6" value="Soldador"><label for="esp6">Soldador</label></div>
-        <div class="radio-chip"><input type="radio" name="especialidad" id="esp7" value="Otro"><label for="esp7">Otro</label></div>
+      <label class="req">Técnico(s) asignado(s)</label>
+      <div class="checkbox-group" id="tecnicoGroup">
+        <div class="checkbox-chip"><input type="checkbox" name="tecnico" id="tec1" value="Cristhian"><label for="tec1">Cristhian</label></div>
+        <div class="checkbox-chip"><input type="checkbox" name="tecnico" id="tec2" value="Ismael"><label for="tec2">Ismael</label></div>
+        <div class="checkbox-chip"><input type="checkbox" name="tecnico" id="tec3" value="Jaime"><label for="tec3">Jaime</label></div>
+        <div class="checkbox-chip"><input type="checkbox" name="tecnico" id="tec4" value="Pablo"><label for="tec4">Pablo</label></div>
+        <div class="checkbox-chip"><input type="checkbox" name="tecnico" id="tec5" value="Mauricio"><label for="tec5">Mauricio</label></div>
+        <div class="checkbox-chip"><input type="checkbox" name="tecnico" id="tec6" value="Viera"><label for="tec6">Viera</label></div>
+        <div class="checkbox-chip"><input type="checkbox" name="tecnico" id="tec7" value="Gian Franco"><label for="tec7">Gian Franco</label></div>
+        <div class="checkbox-chip"><input type="checkbox" name="tecnico" id="tec8" value="Andy"><label for="tec8">Andy</label></div>
+        <div class="checkbox-chip"><input type="checkbox" name="tecnico" id="tec9" value="Victor"><label for="tec9">Victor</label></div>
       </div>
-      <input type="text" id="especialidadOtro" placeholder="Especifica la especialidad" style="display:none;margin-top:10px;">
+      <div class="field-error" id="tecnicoError" style="display:none;">Selecciona al menos un técnico.</div>
     </div>
 
     <div class="section">
       <div class="section-title"><span class="section-num">3</span><h2>Ubicación</h2></div>
 
-      <label for="lugar" class="req">Lugar</label>
-      <select id="lugar" required>
-        <option value="" disabled selected>Selecciona un lugar…</option>
-        <option>Garita</option>
-        <option>Oficina administrativa 1er piso</option>
-        <option>Oficina de comercio exterior</option>
-        <option>Oficina administrativa 2do piso</option>
-        <option>Oficina de administración y finanzas</option>
-        <option>Oficina de logística</option>
-        <option>Oficina de producción</option>
-        <option>Almacén general</option>
-        <option>Comedor</option>
-        <option>Sala de máquinas - Zona alta</option>
-        <option>Sala de máquinas 1</option>
-        <option>Sala de máquinas 2</option>
-        <option>Zona de ingreso a planta</option>
-        <option>Zona de empaque</option>
-        <option>Zona de envasado de productos cocidos</option>
-        <option>Área de perfilado</option>
-        <option>Zona de cocina de planta</option>
-        <option>Productor de hielo</option>
-        <option>Laminado</option>
-        <option>Zona de envasado fresco</option>
-        <option>Zona de lavado</option>
-        <option>Zona de fileteo</option>
-        <option>Zona de recepción</option>
-        <option>Área temporal de residuos sólidos</option>
-        <option>Túnel 1</option>
-        <option>Túnel 2</option>
-        <option>Túnel 3</option>
-        <option>Cámara 1</option>
-        <option>Cámara 2</option>
-        <option>Cámara 3</option>
-        <option>Zona de pasadizo de cámaras</option>
-        <option>Precámara</option>
-        <option>Tópico</option>
-        <option>Baño general de hombres</option>
-        <option>Baño general de mujeres</option>
-        <option>Vestidor de hombres</option>
-        <option>Vestidor de mujeres</option>
-        <option value="__otro__">Otros lugares (especificar)</option>
-      </select>
+      <label for="lugarBuscar" class="req">Lugar</label>
+      <div class="combo-lugar" id="comboLugar">
+        <input type="text" id="lugarBuscar" placeholder="Escribe para buscar un lugar…" autocomplete="off">
+        <input type="hidden" id="lugar">
+        <div class="combo-lista" id="lugarLista"></div>
+      </div>
+      <div class="field-error" id="lugarError" style="display:none;">Selecciona un lugar de la lista.</div>
       <input type="text" id="lugarOtro" placeholder="Especifica el lugar" style="display:none;margin-top:10px;">
     </div>
 
@@ -124,6 +101,7 @@
           <select id="tipoMantenimiento" required>
             <option value="Correctivo" selected>Correctivo</option>
             <option value="Preventivo">Preventivo</option>
+            <option value="De Mejora">De Mejora</option>
             <option value="Otro">Otro</option>
           </select>
         </div>

@@ -7,15 +7,65 @@
   const folioValue = document.getElementById("folioValue");
   const fechaValue = document.getElementById("fechaValue");
   const fechaInput = document.getElementById("fecha");
-  const lugarSelect = document.getElementById("lugar");
+
+  const areaSolicitante = document.getElementById("areaSolicitante");
+  const areaSolicitanteOtro = document.getElementById("areaSolicitanteOtro");
+
+  const tecnicoChecks = document.querySelectorAll('input[name="tecnico"]');
+  const tecnicoError = document.getElementById("tecnicoError");
+
+  const lugarBuscar = document.getElementById("lugarBuscar");
+  const lugarHidden = document.getElementById("lugar");
+  const lugarLista = document.getElementById("lugarLista");
+  const lugarError = document.getElementById("lugarError");
   const lugarOtro = document.getElementById("lugarOtro");
-  const especialidadOtro = document.getElementById("especialidadOtro");
-  const especialidadRadios = document.querySelectorAll('input[name="especialidad"]');
+
   const fotosInput = document.getElementById("fotos");
   const previewGrid = document.getElementById("previewGrid");
   const configWarning = document.getElementById("configWarning");
 
   let fotosSeleccionadas = []; // { dataUrl, name }
+
+  const LUGARES = [
+    "Garita",
+    "Oficina administrativa 1er piso",
+    "Oficina de comercio exterior",
+    "Oficina administrativa 2do piso",
+    "Oficina de administración y finanzas",
+    "Oficina de logística",
+    "Oficina de producción",
+    "Almacén general",
+    "Comedor",
+    "Sala de máquinas - Zona alta",
+    "Sala de máquinas 1",
+    "Sala de máquinas 2",
+    "Zona de ingreso a planta",
+    "Zona de empaque",
+    "Zona de envasado de productos cocidos",
+    "Área de perfilado",
+    "Zona de cocina de planta",
+    "Productor de hielo",
+    "Laminado",
+    "Zona de envasado fresco",
+    "Zona de lavado",
+    "Zona de fileteo",
+    "Zona de recepción",
+    "Área temporal de residuos sólidos",
+    "Túnel 1",
+    "Túnel 2",
+    "Túnel 3",
+    "Cámara 1",
+    "Cámara 2",
+    "Cámara 3",
+    "Zona de pasadizo de cámaras",
+    "Precámara",
+    "Tópico",
+    "Baño general de hombres",
+    "Baño general de mujeres",
+    "Vestidor de hombres",
+    "Vestidor de mujeres"
+  ];
+  const OTRO_LUGAR = "__otro__";
 
   // ---------- Folio y fecha ----------
   function generarFolio() {
@@ -41,29 +91,90 @@
     configWarning.style.display = "block";
   }
 
-  // ---------- Especialidad "Otro" ----------
-  especialidadRadios.forEach((radio) => {
-    radio.addEventListener("change", () => {
-      if (radio.value === "Otro" && radio.checked) {
-        especialidadOtro.style.display = "block";
-        especialidadOtro.required = true;
-      } else if (radio.checked) {
-        especialidadOtro.style.display = "none";
-        especialidadOtro.required = false;
-        especialidadOtro.value = "";
-      }
+  // ---------- Área solicitante "Otro" ----------
+  areaSolicitante.addEventListener("change", () => {
+    if (areaSolicitante.value === "__otro__") {
+      areaSolicitanteOtro.style.display = "block";
+      areaSolicitanteOtro.required = true;
+    } else {
+      areaSolicitanteOtro.style.display = "none";
+      areaSolicitanteOtro.required = false;
+      areaSolicitanteOtro.value = "";
+    }
+  });
+
+  // ---------- Técnicos: quitar el error en cuanto marquen alguno ----------
+  tecnicoChecks.forEach((chk) => {
+    chk.addEventListener("change", () => {
+      const algunoMarcado = Array.from(tecnicoChecks).some((c) => c.checked);
+      if (algunoMarcado) tecnicoError.style.display = "none";
     });
   });
 
-  // ---------- Lugar "Otro" ----------
-  lugarSelect.addEventListener("change", () => {
-    if (lugarSelect.value === "__otro__") {
+  // ---------- Lugar: buscador con autocompletado ----------
+  function renderListaLugares(filtro) {
+    const texto = (filtro || "").trim().toLowerCase();
+    const coincidencias = texto
+      ? LUGARES.filter((l) => l.toLowerCase().includes(texto))
+      : LUGARES;
+
+    lugarLista.innerHTML = "";
+
+    coincidencias.forEach((lugar) => {
+      const item = document.createElement("div");
+      item.className = "combo-item";
+      item.textContent = lugar;
+      item.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        seleccionarLugar(lugar);
+      });
+      lugarLista.appendChild(item);
+    });
+
+    const itemOtro = document.createElement("div");
+    itemOtro.className = "combo-item";
+    itemOtro.textContent = "Otros lugares (especificar)";
+    itemOtro.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      seleccionarLugar(OTRO_LUGAR);
+    });
+    lugarLista.appendChild(itemOtro);
+
+    if (coincidencias.length === 0) {
+      const vacio = document.createElement("div");
+      vacio.className = "combo-item combo-vacio";
+      vacio.textContent = "Sin coincidencias — usa \"Otros lugares\"";
+      lugarLista.insertBefore(vacio, lugarLista.firstChild);
+    }
+
+    lugarLista.classList.add("abierta");
+  }
+
+  function seleccionarLugar(valor) {
+    if (valor === OTRO_LUGAR) {
+      lugarBuscar.value = "Otros lugares (especificar)";
+      lugarHidden.value = OTRO_LUGAR;
       lugarOtro.style.display = "block";
       lugarOtro.required = true;
     } else {
+      lugarBuscar.value = valor;
+      lugarHidden.value = valor;
       lugarOtro.style.display = "none";
       lugarOtro.required = false;
       lugarOtro.value = "";
+    }
+    lugarError.style.display = "none";
+    lugarLista.classList.remove("abierta");
+  }
+
+  lugarBuscar.addEventListener("focus", () => renderListaLugares(lugarBuscar.value));
+  lugarBuscar.addEventListener("input", () => {
+    lugarHidden.value = ""; // hasta que elija una opción de la lista, no hay lugar válido
+    renderListaLugares(lugarBuscar.value);
+  });
+  document.addEventListener("click", (e) => {
+    if (!document.getElementById("comboLugar").contains(e.target)) {
+      lugarLista.classList.remove("abierta");
     }
   });
 
@@ -176,17 +287,34 @@
       return;
     }
 
-    const lugarFinal = lugarSelect.value === "__otro__" ? lugarOtro.value.trim() : lugarSelect.value;
-    const especialidad = form.querySelector('input[name="especialidad"]:checked');
-    const especialidadFinal =
-      especialidad && especialidad.value === "Otro" ? especialidadOtro.value.trim() : (especialidad ? especialidad.value : "");
+    const tecnicosSeleccionados = Array.from(tecnicoChecks)
+      .filter((c) => c.checked)
+      .map((c) => c.value);
+
+    if (tecnicosSeleccionados.length === 0) {
+      tecnicoError.style.display = "block";
+      statusMsg.textContent = "Corrige los campos marcados en rojo antes de enviar.";
+      statusMsg.className = "status err";
+      return;
+    }
+
+    if (!lugarHidden.value) {
+      lugarError.style.display = "block";
+      statusMsg.textContent = "Corrige los campos marcados en rojo antes de enviar.";
+      statusMsg.className = "status err";
+      return;
+    }
+
+    const areaFinal =
+      areaSolicitante.value === "__otro__" ? areaSolicitanteOtro.value.trim() : areaSolicitante.value;
+    const lugarFinal = lugarHidden.value === OTRO_LUGAR ? lugarOtro.value.trim() : lugarHidden.value;
 
     const payload = {
       action: "crear",
       folio,
       fecha: fechaInput.value,
-      solicitante: document.getElementById("nombreSolicitante").value.trim(),
-      especialidad: especialidadFinal,
+      solicitante: areaFinal,
+      especialidad: tecnicosSeleccionados.join(", "),
       lugar: lugarFinal,
       tipoMantenimiento: document.getElementById("tipoMantenimiento").value,
       prioridad: document.getElementById("prioridad").value,
@@ -212,8 +340,12 @@
       form.reset();
       fotosSeleccionadas = [];
       renderPreviews();
+      lugarBuscar.value = "";
+      lugarHidden.value = "";
       lugarOtro.style.display = "none";
-      especialidadOtro.style.display = "none";
+      areaSolicitanteOtro.style.display = "none";
+      tecnicoError.style.display = "none";
+      lugarError.style.display = "none";
       fechaInput.value = hoy;
       fechaValue.textContent = hoy;
 
