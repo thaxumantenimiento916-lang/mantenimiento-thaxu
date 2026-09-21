@@ -3,7 +3,6 @@
 
   const listaAvisos = document.getElementById("listaAvisos");
   const loadingState = document.getElementById("loadingState");
-  const filterTabs = document.getElementById("filterTabs");
   const filterCount = document.getElementById("filterCount");
   const configWarning = document.getElementById("configWarning");
   const dashboard = document.getElementById("dashboard");
@@ -11,6 +10,8 @@
   const fechaDesde = document.getElementById("fechaDesde");
   const fechaHasta = document.getElementById("fechaHasta");
   const limpiarFechas = document.getElementById("limpiarFechas");
+  const filtroEstadoResumen = document.getElementById("filtroEstadoResumen");
+  const filtroTecnicoResumen = document.getElementById("filtroTecnicoResumen");
 
   const TECNICOS = ["Cristhian", "Ismael", "Jaime", "Pablo", "Mauricio", "Viera", "Gian Franco", "Andy", "Victor"];
 
@@ -20,27 +21,41 @@
   let chartEstado = null;
   let chartTecnicos = null;
 
-  // ---------- Filtro de técnico: construir los chips ----------
-  TECNICOS.forEach((nombre) => {
-    const chip = document.createElement("button");
-    chip.type = "button";
-    chip.className = "tecnico-chip";
-    chip.textContent = nombre;
-    chip.dataset.tecnico = nombre;
-    chip.addEventListener("click", () => {
-      if (tecnicosActivos.includes(nombre)) {
-        tecnicosActivos = tecnicosActivos.filter((t) => t !== nombre);
-        chip.classList.remove("active");
-      } else {
-        tecnicosActivos.push(nombre);
-        chip.classList.add("active");
-      }
+  // ---------- Filtro de estado (desglosable) ----------
+  document.querySelectorAll('input[name="filtroEstado"]').forEach((radio) => {
+    radio.addEventListener("change", () => {
+      filtroActivo = radio.value;
+      const etiquetas = { todos: "Todos", pendiente: "Pendientes", resuelto: "Resueltos" };
+      filtroEstadoResumen.textContent = etiquetas[filtroActivo];
+      document.getElementById("filtroEstadoWrap").open = false;
       renderLista();
     });
-    tecnicoFilter.appendChild(chip);
+  });
+
+  // ---------- Filtro de técnico (desglosable con checkboxes) ----------
+  TECNICOS.forEach((nombre) => {
+    const label = document.createElement("label");
+    label.className = "filtro-checkbox";
+    label.innerHTML = `<input type="checkbox" value="${nombre}"> ${nombre}`;
+    label.querySelector("input").addEventListener("change", (e) => {
+      if (e.target.checked) {
+        tecnicosActivos.push(nombre);
+      } else {
+        tecnicosActivos = tecnicosActivos.filter((t) => t !== nombre);
+      }
+      filtroTecnicoResumen.textContent =
+        tecnicosActivos.length === 0 ? "Todos" : `${tecnicosActivos.length} seleccionado(s)`;
+      renderLista();
+    });
+    tecnicoFilter.appendChild(label);
   });
 
   // ---------- Filtro de fecha ----------
+  // "Desde" arranca en el día de hoy (se ve lo que ocurre desde hoy en
+  // adelante); "Hasta" queda libre para ver historial completo con el
+  // botón "Limpiar fechas".
+  fechaDesde.value = new Date().toISOString().split("T")[0];
+
   fechaDesde.addEventListener("change", renderLista);
   fechaHasta.addEventListener("change", renderLista);
   limpiarFechas.addEventListener("click", () => {
@@ -61,8 +76,24 @@
     cargarAvisos();
   }
 
+  const LOCAL_CACHE_KEY = "thaxu_avisos_cache_v1";
+
   // ---------- Cargar avisos desde Apps Script ----------
   async function cargarAvisos() {
+    // 1) Pinta de inmediato con lo último que se vio, si existe, mientras
+    //    se trae la versión fresca por detrás (así no se ve "Cargando…"
+    //    en cada visita, solo la primera vez).
+    try {
+      const cacheado = localStorage.getItem(LOCAL_CACHE_KEY);
+      if (cacheado) {
+        avisos = JSON.parse(cacheado);
+        renderDashboard();
+        renderLista();
+      }
+    } catch (err) {
+      console.error("No se pudo leer la caché local:", err);
+    }
+
     try {
       const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=listar`, { method: "GET" });
       if (!res.ok) throw new Error(`El servidor respondió con estado ${res.status}`);
@@ -76,22 +107,22 @@
 
       renderDashboard();
       renderLista();
+
+      try {
+        localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(avisos));
+      } catch (err) {
+        console.error("No se pudo guardar la caché local:", err);
+      }
     } catch (err) {
       console.error(err);
-      loadingState.textContent =
-        "No se pudo cargar la lista de avisos. Revisa tu conexión o el proyecto de Apps Script.";
+      if (avisos.length === 0) {
+        loadingState.textContent =
+          "No se pudo cargar la lista de avisos. Revisa tu conexión o el proyecto de Apps Script.";
+      }
+      // Si ya había datos de la caché local pintados, los dejamos tal cual
+      // en vez de reemplazar la pantalla con un mensaje de error.
     }
   }
-
-  // ---------- Filtros ----------
-  filterTabs.addEventListener("click", (e) => {
-    const btn = e.target.closest(".filter-tab");
-    if (!btn) return;
-    filterTabs.querySelectorAll(".filter-tab").forEach((b) => b.classList.remove("active"));
-    btn.classList.add("active");
-    filtroActivo = btn.dataset.filter;
-    renderLista();
-  });
 
   function avisosFiltrados() {
     let lista = avisos;
@@ -131,7 +162,10 @@
         labels: ["Pendientes", "Resueltos"],
         datasets: [{ data: [pendientes, resueltos], backgroundColor: ["#c98600", "#2e7d4f"] }]
       },
-      options: { plugins: { legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 11 } } } } }
+      options: {
+        maintainAspectRatio: false,
+        plugins: { legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 11 } } } }
+      }
     });
 
     if (chartTecnicos) chartTecnicos.destroy();
@@ -143,6 +177,7 @@
       },
       options: {
         indexAxis: "y",
+        maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: { x: { ticks: { precision: 0 } } }
       }
@@ -328,6 +363,13 @@
         panel.style.display = "none";
         panel.innerHTML = "";
         renderLista();
+        renderDashboard();
+
+        try {
+          localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(avisos));
+        } catch (err) {
+          console.error("No se pudo actualizar la caché local:", err);
+        }
       } catch (err) {
         console.error(err);
         errorBox.textContent = "No se pudo guardar el cambio. Revisa tu conexión e intenta de nuevo.";

@@ -276,29 +276,70 @@
   border-bottom-color:var(--amber);
 }
 
-/* ---------- Pestañas de filtro (visualizador) ---------- */
-.filter-tabs{
-  display:flex;
-  gap:8px;
+/* ---------- Filtros desglosables (Estado / Técnico) ---------- */
+.filters-row{
   max-width:640px;
   margin:16px auto 0;
   padding:0 20px;
+  display:flex;
+  gap:10px;
   flex-wrap:wrap;
 }
-.filter-tab{
-  padding:8px 14px;
+.filtro-desglosable{
   border:1px solid var(--line);
   background:#fff;
-  font-size:0.82rem;
-  font-weight:600;
-  color:var(--ink-soft);
-  cursor:pointer;
   border-radius:2px;
+  flex:1;
+  min-width:180px;
 }
-.filter-tab.active{
-  background:var(--ink);
-  border-color:var(--ink);
-  color:#fff;
+.filtro-desglosable summary{
+  padding:9px 14px;
+  font-size:0.85rem;
+  font-weight:600;
+  color:var(--ink);
+  cursor:pointer;
+  list-style:none;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.filtro-desglosable summary::-webkit-details-marker{display:none;}
+.filtro-desglosable summary::after{
+  content:"▾";
+  color:var(--ink-soft);
+  font-size:0.75rem;
+  margin-left:8px;
+}
+.filtro-desglosable summary span{color:var(--steel);font-weight:700;}
+.filtro-desglosable[open] summary::after{content:"▴";}
+.filtro-body{
+  border-top:1px solid var(--line);
+  padding:10px 14px 12px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  max-height:220px;
+  overflow-y:auto;
+}
+.filtro-radio{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:0.85rem;
+  color:var(--ink);
+  cursor:pointer;
+  font-weight:400;
+  margin:0;
+}
+.filtro-checkbox{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:0.85rem;
+  color:var(--ink);
+  cursor:pointer;
+  font-weight:400;
+  margin:0;
 }
 .filter-count{
   max-width:640px;
@@ -561,33 +602,9 @@
   color:var(--ink-soft);
 }
 .chart-card canvas{max-width:100%;}
+.chart-wrap{position:relative;height:200px;}
 @media (max-width:560px){
   .dashboard{grid-template-columns:1fr;}
-}
-
-/* ---------- Filtro de técnico (chips multi-selección) ---------- */
-.tecnico-filter{
-  max-width:640px;
-  margin:10px auto 0;
-  padding:0 20px;
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-.tecnico-chip{
-  padding:6px 12px;
-  border:1px solid var(--line);
-  background:#fff;
-  font-size:0.78rem;
-  font-weight:600;
-  color:var(--ink-soft);
-  cursor:pointer;
-  border-radius:2px;
-}
-.tecnico-chip.active{
-  background:var(--steel);
-  border-color:var(--steel);
-  color:#fff;
 }
 
 /* ---------- Filtro de fecha ---------- */

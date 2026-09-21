@@ -42,21 +42,29 @@
 <div class="dashboard" id="dashboard" style="display:none;">
   <div class="chart-card">
     <h3>Avisos por estado</h3>
-    <canvas id="chartEstado"></canvas>
+    <div class="chart-wrap"><canvas id="chartEstado"></canvas></div>
   </div>
   <div class="chart-card">
     <h3>Avisos por técnico</h3>
-    <canvas id="chartTecnicos"></canvas>
+    <div class="chart-wrap"><canvas id="chartTecnicos"></canvas></div>
   </div>
 </div>
 
-<div class="filter-tabs" id="filterTabs">
-  <button type="button" class="filter-tab active" data-filter="todos">Todos</button>
-  <button type="button" class="filter-tab" data-filter="pendiente">Pendientes</button>
-  <button type="button" class="filter-tab" data-filter="resuelto">Resueltos</button>
-</div>
+<div class="filters-row">
+  <details class="filtro-desglosable" id="filtroEstadoWrap">
+    <summary>Estado: <span id="filtroEstadoResumen">Todos</span></summary>
+    <div class="filtro-body" id="filtroEstadoBody">
+      <label class="filtro-radio"><input type="radio" name="filtroEstado" value="todos" checked> Todos</label>
+      <label class="filtro-radio"><input type="radio" name="filtroEstado" value="pendiente"> Pendientes</label>
+      <label class="filtro-radio"><input type="radio" name="filtroEstado" value="resuelto"> Resueltos</label>
+    </div>
+  </details>
 
-<div class="tecnico-filter" id="tecnicoFilter"></div>
+  <details class="filtro-desglosable" id="filtroTecnicoWrap">
+    <summary>Técnico: <span id="filtroTecnicoResumen">Todos</span></summary>
+    <div class="filtro-body" id="tecnicoFilter"></div>
+  </details>
+</div>
 
 <div class="fecha-filter">
   <label for="fechaDesde">Desde</label>
