@@ -6,7 +6,669 @@
 <title>Visualizador de Avisos — Mantenimiento</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<style>
+/* ============================================================
+   Estilos compartidos — Registro y Visualizador de mantenimiento
+   ============================================================ */
+
+  :root{
+    --bg:#e7eaec;
+    --panel:#ffffff;
+    --ink:#1b2430;
+    --ink-soft:#566270;
+    --amber:#f2a900;
+    --amber-dark:#c98600;
+    --steel:#3a5a73;
+    --danger:#c0392b;
+    --success:#2e7d4f;
+    --line:#c7ccd1;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:60px;
+  }
+  .letterhead{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:#fff;
+    padding:14px 20px;
+    max-width:640px;
+    margin:0 auto;
+    border-bottom:1px solid var(--line);
+  }
+  .letterhead img{
+    height:42px;
+    width:auto;
+    display:block;
+  }
+  .letterhead-text{
+    display:flex;
+    flex-direction:column;
+    line-height:1.3;
+  }
+  .letterhead-text strong{
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:700;
+    font-size:1.05rem;
+    color:var(--ink);
+    letter-spacing:0.01em;
+  }
+  .letterhead-text span{
+    font-size:0.78rem;
+    color:var(--ink-soft);
+  }
+
+  .plate{
+    background:var(--ink);
+    color:#fff;
+    padding:22px 20px 18px;
+    border-bottom:6px solid var(--amber);
+  }
+  .plate-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    max-width:640px;
+    margin:0 auto;
+  }
+  .plate h1{
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:700;
+    font-size:1.65rem;
+    letter-spacing:0.02em;
+    text-transform:uppercase;
+    margin:0;
+    line-height:1.05;
+  }
+  .plate p{
+    margin:4px 0 0;
+    color:#aeb8c2;
+    font-size:0.85rem;
+  }
+  .folio{
+    text-align:right;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.72rem;
+    color:var(--amber);
+    white-space:nowrap;
+    line-height:1.5;
+  }
+  .folio span{display:block;color:#aeb8c2;font-size:0.65rem;letter-spacing:0.04em;}
+
+  .plate-help{
+    max-width:640px;
+    margin:14px auto 0;
+    font-size:0.8rem;
+    line-height:1.5;
+    color:#c3ccd4;
+  }
+  .plate-help b{color:#fff;font-weight:600;}
+
+  main{max-width:640px;margin:0 auto;padding:20px 20px 0;}
+
+  .section{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:4px solid var(--steel);
+    margin-bottom:18px;
+    padding:18px 18px 20px;
+  }
+  .section.evidencia{border-left-color:var(--amber-dark);}
+  .section-title{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .section-num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.8rem;
+    color:var(--ink-soft);
+  }
+  .section-title h2{
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    font-size:1.1rem;
+    margin:0;
+    color:var(--ink);
+  }
+
+  label{
+    display:block;
+    font-size:0.8rem;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:5px;
+    margin-top:14px;
+  }
+  label:first-of-type{margin-top:0;}
+  .req::after{content:" *";color:var(--danger);}
+
+  input[type=text],
+  input[type=date],
+  select,
+  textarea{
+    width:100%;
+    padding:11px 12px;
+    border:1px solid var(--line);
+    background:#fbfbfc;
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:0.95rem;
+    border-radius:2px;
+  }
+  input:focus,select:focus,textarea:focus{
+    outline:2px solid var(--steel);
+    outline-offset:1px;
+    background:#fff;
+  }
+  textarea{resize:vertical;min-height:90px;}
+
+  .row2{display:flex;gap:12px;}
+  .row2 > div{flex:1;}
+
+  .radio-group{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+  .radio-chip{
+    position:relative;
+  }
+  .radio-chip input{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer;margin:0;}
+  .radio-chip label{
+    margin:0;
+    padding:9px 14px;
+    border:1px solid var(--line);
+    background:#fbfbfc;
+    font-size:0.85rem;
+    font-weight:500;
+    color:var(--ink);
+    cursor:pointer;
+    border-radius:2px;
+  }
+  .radio-chip input:checked + label{
+    background:var(--ink);
+    border-color:var(--ink);
+    color:#fff;
+  }
+  .radio-chip input:focus-visible + label{outline:2px solid var(--steel);}
+
+  .photo-input{
+    border:1.5px dashed var(--line);
+    background:#fbfbfc;
+    padding:20px 14px;
+    text-align:center;
+    cursor:pointer;
+  }
+  .photo-input input{display:none;}
+  .photo-input .hint{font-size:0.8rem;color:var(--ink-soft);margin-top:4px;}
+  .photo-input .icon{font-size:1.6rem;}
+
+  #previewGrid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(84px,1fr));
+    gap:8px;
+    margin-top:12px;
+  }
+  .thumb{position:relative;aspect-ratio:1;overflow:hidden;border:1px solid var(--line);}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .thumb button{
+    position:absolute;top:2px;right:2px;
+    background:rgba(27,36,48,0.85);color:#fff;border:none;
+    width:20px;height:20px;font-size:0.75rem;cursor:pointer;line-height:1;
+  }
+
+  .submit-bar{max-width:640px;margin:0 auto;padding:4px 20px 0;}
+  button.submit{
+    width:100%;
+    background:var(--amber);
+    color:var(--ink);
+    border:none;
+    font-family:'Barlow Condensed',sans-serif;
+    font-weight:700;
+    font-size:1.15rem;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    padding:16px;
+    cursor:pointer;
+    border-radius:2px;
+  }
+  button.submit:active{background:var(--amber-dark);}
+  button.submit:disabled{background:var(--line);color:var(--ink-soft);cursor:wait;}
+
+  .status{
+    max-width:640px;margin:14px auto 0;padding:0 20px;
+    font-size:0.9rem;
+  }
+  .status.ok{color:var(--success);}
+  .status.err{color:var(--danger);}
+
+  .config-warning{
+    max-width:640px;margin:14px auto 0;padding:10px 14px;
+    background:#fff6e0;border:1px solid var(--amber-dark);
+    font-size:0.82rem;color:#6b4c00;
+  }
+
+  @media (max-width:420px){
+    .row2{flex-direction:column;gap:0;}
+    .plate h1{font-size:1.4rem;}
+  }
+
+
+/* ---------- Navegación entre pantallas ---------- */
+.navbar{
+  max-width:640px;
+  margin:0 auto;
+  display:flex;
+  gap:0;
+  background:#fff;
+  border-bottom:1px solid var(--line);
+}
+.navbar a{
+  flex:1;
+  text-align:center;
+  padding:11px 10px;
+  font-size:0.85rem;
+  font-weight:600;
+  color:var(--ink-soft);
+  text-decoration:none;
+  border-bottom:3px solid transparent;
+}
+.navbar a.active{
+  color:var(--ink);
+  border-bottom-color:var(--amber);
+}
+
+/* ---------- Filtros desglosables (Estado / Técnico) ---------- */
+.filters-row{
+  max-width:640px;
+  margin:16px auto 0;
+  padding:0 20px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.filtro-desglosable{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:2px;
+  flex:1;
+  min-width:180px;
+}
+.filtro-desglosable summary{
+  padding:9px 14px;
+  font-size:0.85rem;
+  font-weight:600;
+  color:var(--ink);
+  cursor:pointer;
+  list-style:none;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.filtro-desglosable summary::-webkit-details-marker{display:none;}
+.filtro-desglosable summary::after{
+  content:"▾";
+  color:var(--ink-soft);
+  font-size:0.75rem;
+  margin-left:8px;
+}
+.filtro-desglosable summary span{color:var(--steel);font-weight:700;}
+.filtro-desglosable[open] summary::after{content:"▴";}
+.filtro-body{
+  border-top:1px solid var(--line);
+  padding:10px 14px 12px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  max-height:220px;
+  overflow-y:auto;
+}
+.filtro-radio{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:0.85rem;
+  color:var(--ink);
+  cursor:pointer;
+  font-weight:400;
+  margin:0;
+}
+.filtro-checkbox{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:0.85rem;
+  color:var(--ink);
+  cursor:pointer;
+  font-weight:400;
+  margin:0;
+}
+.filter-count{
+  max-width:640px;
+  margin:10px auto 0;
+  padding:0 20px;
+  font-size:0.8rem;
+  color:var(--ink-soft);
+}
+
+/* ---------- Lista de avisos ---------- */
+#listaAvisos{
+  max-width:640px;
+  margin:0 auto;
+  padding:14px 20px 20px;
+}
+.aviso-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-left:4px solid var(--steel);
+  margin-bottom:14px;
+  padding:16px 18px;
+}
+.aviso-card.resuelto{border-left-color:var(--success);}
+.aviso-card.pendiente{border-left-color:var(--amber-dark);}
+
+.aviso-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+  margin-bottom:8px;
+}
+.aviso-folio{
+  font-family:'JetBrains Mono',monospace;
+  font-size:0.72rem;
+  color:var(--ink-soft);
+}
+.aviso-lugar{
+  font-family:'Barlow Condensed',sans-serif;
+  font-weight:600;
+  font-size:1.1rem;
+  text-transform:uppercase;
+  letter-spacing:0.02em;
+  margin:2px 0 0;
+}
+
+.badge{
+  font-size:0.72rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:0.03em;
+  padding:4px 9px;
+  border-radius:2px;
+  white-space:nowrap;
+}
+.badge.pendiente{background:#fff2d6;color:#8a5a00;}
+.badge.resuelto{background:#dff1e4;color:var(--success);}
+
+.aviso-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px 14px;
+  font-size:0.82rem;
+  color:var(--ink-soft);
+  margin-bottom:10px;
+}
+.aviso-meta b{color:var(--ink);font-weight:600;}
+
+.aviso-desc{
+  font-size:0.9rem;
+  color:var(--ink);
+  margin-bottom:10px;
+  line-height:1.45;
+}
+
+.aviso-fotos{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:12px;
+}
+.aviso-fotos a{
+  font-size:0.78rem;
+  color:var(--steel);
+  border:1px solid var(--line);
+  padding:5px 10px;
+  text-decoration:none;
+  border-radius:2px;
+}
+
+.aviso-actions{display:flex;justify-content:flex-end;}
+.btn-toggle{
+  border:1px solid var(--ink);
+  background:#fff;
+  color:var(--ink);
+  font-size:0.82rem;
+  font-weight:600;
+  padding:8px 14px;
+  cursor:pointer;
+  border-radius:2px;
+}
+.btn-toggle.resolver{background:var(--ink);color:#fff;}
+.btn-toggle:disabled{opacity:0.5;cursor:wait;}
+
+.empty-state{
+  max-width:640px;margin:30px auto;padding:0 20px;
+  text-align:center;color:var(--ink-soft);font-size:0.9rem;
+}
+.loading-state{
+  max-width:640px;margin:30px auto;padding:0 20px;
+  text-align:center;color:var(--ink-soft);font-size:0.9rem;
+}
+
+/* ---------- Panel de confirmación: clave + evidencia ---------- */
+.confirm-panel{
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px dashed var(--line);
+}
+.confirm-panel label{
+  display:block;
+  font-size:0.78rem;
+  font-weight:600;
+  color:var(--ink-soft);
+  margin-bottom:5px;
+  margin-top:10px;
+}
+.confirm-panel label:first-child{margin-top:0;}
+.confirm-panel input[type=password]{
+  width:100%;
+  padding:9px 11px;
+  border:1px solid var(--line);
+  background:#fbfbfc;
+  font-family:'Inter',sans-serif;
+  font-size:0.9rem;
+  border-radius:2px;
+}
+.confirm-panel .photo-input-mini{
+  border:1.5px dashed var(--line);
+  background:#fbfbfc;
+  padding:12px;
+  text-align:center;
+  cursor:pointer;
+  font-size:0.8rem;
+  color:var(--ink-soft);
+}
+.confirm-panel .photo-input-mini input{display:none;}
+.confirm-panel .photo-input-mini.has-photos{color:var(--success);border-color:var(--success);}
+
+.confirm-panel .confirm-preview{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(56px,1fr));
+  gap:6px;
+  margin-top:8px;
+}
+.confirm-panel .confirm-preview .thumb-mini{
+  aspect-ratio:1;overflow:hidden;border:1px solid var(--line);
+}
+.confirm-panel .confirm-preview img{width:100%;height:100%;object-fit:cover;display:block;}
+
+.confirm-panel .confirm-error{
+  font-size:0.78rem;
+  color:var(--danger);
+  margin-top:8px;
+}
+.confirm-panel .confirm-actions{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
+.confirm-panel .confirm-actions button{
+  flex:1;
+  padding:9px;
+  font-size:0.82rem;
+  font-weight:600;
+  border-radius:2px;
+  cursor:pointer;
+}
+.confirm-panel .btn-confirm{background:var(--ink);color:#fff;border:1px solid var(--ink);}
+.confirm-panel .btn-confirm:disabled{opacity:0.5;cursor:wait;}
+.confirm-panel .btn-cancel{background:#fff;color:var(--ink-soft);border:1px solid var(--line);}
+
+/* ---------- Checkboxes de técnico (multi-selección) ---------- */
+.checkbox-group{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.checkbox-chip{position:relative;}
+.checkbox-chip input{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer;margin:0;}
+.checkbox-chip label{
+  margin:0;
+  padding:9px 14px;
+  border:1px solid var(--line);
+  background:#fbfbfc;
+  font-size:0.85rem;
+  font-weight:500;
+  color:var(--ink);
+  cursor:pointer;
+  border-radius:2px;
+  display:inline-block;
+}
+.checkbox-chip input:checked + label{
+  background:var(--ink);
+  border-color:var(--ink);
+  color:#fff;
+}
+.checkbox-chip input:focus-visible + label{outline:2px solid var(--steel);}
+
+.field-error{
+  font-size:0.78rem;
+  color:var(--danger);
+  margin-top:8px;
+}
+
+/* ---------- Lugar: combobox buscable ---------- */
+.combo-lugar{position:relative;}
+.combo-lista{
+  display:none;
+  position:absolute;
+  z-index:20;
+  top:100%;
+  left:0;
+  right:0;
+  max-height:240px;
+  overflow-y:auto;
+  background:#fff;
+  border:1px solid var(--line);
+  border-top:none;
+  box-shadow:0 6px 14px rgba(27,36,48,0.12);
+}
+.combo-lista.abierta{display:block;}
+.combo-item{
+  padding:10px 12px;
+  font-size:0.9rem;
+  color:var(--ink);
+  cursor:pointer;
+}
+.combo-item:hover,
+.combo-item.resaltado{background:var(--bg);}
+.combo-item.combo-vacio{color:var(--ink-soft);cursor:default;}
+
+/* ---------- Dashboard (Visualizador) ---------- */
+.dashboard{
+  max-width:640px;
+  margin:16px auto 0;
+  padding:0 20px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.chart-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  padding:14px;
+}
+.chart-card h3{
+  font-family:'Barlow Condensed',sans-serif;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.02em;
+  font-size:0.9rem;
+  margin:0 0 10px;
+  color:var(--ink-soft);
+}
+.chart-card canvas{max-width:100%;}
+.chart-wrap{position:relative;height:200px;}
+@media (max-width:560px){
+  .dashboard{grid-template-columns:1fr;}
+}
+
+/* ---------- Filtro de fecha ---------- */
+.fecha-filter{
+  max-width:640px;
+  margin:10px auto 0;
+  padding:0 20px;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.fecha-filter label{
+  font-size:0.78rem;
+  font-weight:600;
+  color:var(--ink-soft);
+  margin:0;
+}
+.fecha-filter input[type=date]{
+  padding:7px 9px;
+  border:1px solid var(--line);
+  background:#fff;
+  font-size:0.85rem;
+  border-radius:2px;
+}
+.fecha-filter button{
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--ink-soft);
+  font-size:0.78rem;
+  padding:7px 12px;
+  cursor:pointer;
+  border-radius:2px;
+}
+
+/* ---------- Botón de compartir por WhatsApp ---------- */
+.btn-whatsapp{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  max-width:640px;
+  margin:12px auto 0;
+  padding:13px;
+  background:#25D366;
+  color:#fff;
+  font-weight:600;
+  font-size:0.95rem;
+  text-decoration:none;
+  border-radius:2px;
+  text-align:center;
+}
+.btn-whatsapp:active{background:#1ebc59;}
+
+</style>
 </head>
 <body>
 
@@ -68,7 +730,417 @@
   <div class="loading-state" id="loadingState">Cargando avisos…</div>
 </div>
 
-<script src="config.js"></script>
-<script src="visualizador.js"></script>
+<script>
+window.CONFIG = {
+  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbxTusNWKhZv4aAw5lO8gFC-pd3NanbA2Cl8zCb1Pxwfz2IE2OcoUa2Y-y61lz6YHz117A/exec",
+
+  // Ancho máximo (px) al que se redimensionan las fotos antes
+  // de enviarse, para no mandar archivos pesados.
+  MAX_PHOTO_WIDTH: 1280,
+
+  // Calidad de compresión JPEG (0 a 1)
+  PHOTO_QUALITY: 0.75
+};
+</script>
+<script>
+(function () {
+  "use strict";
+
+  const listaAvisos = document.getElementById("listaAvisos");
+  const loadingState = document.getElementById("loadingState");
+  const filterCount = document.getElementById("filterCount");
+  const configWarning = document.getElementById("configWarning");
+  const tecnicoFilter = document.getElementById("tecnicoFilter");
+  const fechaDesde = document.getElementById("fechaDesde");
+  const fechaHasta = document.getElementById("fechaHasta");
+  const limpiarFechas = document.getElementById("limpiarFechas");
+  const filtroEstadoResumen = document.getElementById("filtroEstadoResumen");
+  const filtroTecnicoResumen = document.getElementById("filtroTecnicoResumen");
+
+  const TECNICOS = ["Cristhian", "Ismael", "Jaime", "Pablo", "Mauricio", "Viera", "Gian Franco", "Andy", "Victor"];
+
+  let avisos = [];
+  let filtroActivo = "todos";
+  let tecnicosActivos = []; // vacío = sin filtrar por técnico
+
+  // ---------- Filtro de estado (desglosable) ----------
+  document.querySelectorAll('input[name="filtroEstado"]').forEach((radio) => {
+    radio.addEventListener("change", () => {
+      filtroActivo = radio.value;
+      const etiquetas = { todos: "Todos", pendiente: "Pendientes", resuelto: "Resueltos" };
+      filtroEstadoResumen.textContent = etiquetas[filtroActivo];
+      document.getElementById("filtroEstadoWrap").open = false;
+      renderLista();
+    });
+  });
+
+  // ---------- Filtro de técnico (desglosable con checkboxes) ----------
+  TECNICOS.forEach((nombre) => {
+    const label = document.createElement("label");
+    label.className = "filtro-checkbox";
+    label.innerHTML = `<input type="checkbox" value="${nombre}"> ${nombre}`;
+    label.querySelector("input").addEventListener("change", (e) => {
+      if (e.target.checked) {
+        tecnicosActivos.push(nombre);
+      } else {
+        tecnicosActivos = tecnicosActivos.filter((t) => t !== nombre);
+      }
+      filtroTecnicoResumen.textContent =
+        tecnicosActivos.length === 0 ? "Todos" : `${tecnicosActivos.length} seleccionado(s)`;
+      renderLista();
+    });
+    tecnicoFilter.appendChild(label);
+  });
+
+  // ---------- Filtro de fecha ----------
+  // Sin valor por defecto: al cargar se ve el historial completo, sin
+  // que la fecha oculte avisos hasta que el usuario elija filtrar.
+
+  fechaDesde.addEventListener("change", renderLista);
+  fechaHasta.addEventListener("change", renderLista);
+  limpiarFechas.addEventListener("click", () => {
+    fechaDesde.value = "";
+    fechaHasta.value = "";
+    renderLista();
+  });
+
+  // ---------- Validación de configuración ----------
+  const faltaConfig =
+    !window.CONFIG ||
+    !CONFIG.APPS_SCRIPT_URL || CONFIG.APPS_SCRIPT_URL.includes("PEGA_AQUI");
+
+  if (faltaConfig) {
+    configWarning.style.display = "block";
+    loadingState.textContent = "No se puede cargar la lista: falta configurar config.js.";
+  } else {
+    cargarAvisos();
+  }
+
+  const LOCAL_CACHE_KEY = "thaxu_avisos_cache_v1";
+
+  // ---------- Cargar avisos desde Apps Script ----------
+  async function cargarAvisos() {
+    // 1) Pinta de inmediato con lo último que se vio, si existe, mientras
+    //    se trae la versión fresca por detrás (así no se ve "Cargando…"
+    //    en cada visita, solo la primera vez).
+    try {
+      const cacheado = localStorage.getItem(LOCAL_CACHE_KEY);
+      if (cacheado) {
+        avisos = JSON.parse(cacheado);
+        renderLista();
+      }
+    } catch (err) {
+      console.error("No se pudo leer la caché local:", err);
+    }
+
+    try {
+      const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=listar`, { method: "GET" });
+      if (!res.ok) throw new Error(`El servidor respondió con estado ${res.status}`);
+      const data = await res.json();
+
+      if (data && data.status === "error") throw new Error(data.message);
+
+      avisos = Array.isArray(data) ? data : (data.value || []);
+      avisos = avisos.map((a) => ({ ...a, Estado: a.Estado || "Pendiente" }));
+      avisos.sort((a, b) => (b.Folio || "").localeCompare(a.Folio || ""));
+
+      renderLista();
+
+      try {
+        localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(avisos));
+      } catch (err) {
+        console.error("No se pudo guardar la caché local:", err);
+      }
+    } catch (err) {
+      console.error(err);
+      if (avisos.length === 0) {
+        loadingState.textContent =
+          "No se pudo cargar la lista de avisos. Revisa tu conexión o el proyecto de Apps Script.";
+      }
+      // Si ya había datos de la caché local pintados, los dejamos tal cual
+      // en vez de reemplazar la pantalla con un mensaje de error.
+    }
+  }
+
+  function avisosFiltrados() {
+    let lista = avisos;
+
+    if (filtroActivo === "pendiente") lista = lista.filter((a) => a.Estado !== "Resuelto");
+    if (filtroActivo === "resuelto") lista = lista.filter((a) => a.Estado === "Resuelto");
+
+    if (tecnicosActivos.length > 0) {
+      lista = lista.filter((a) => {
+        const nombresAviso = (a.Especialidad || "").split(",").map((n) => n.trim());
+        return tecnicosActivos.some((t) => nombresAviso.includes(t));
+      });
+    }
+
+    if (fechaDesde.value) lista = lista.filter((a) => (a.Fecha || "") >= fechaDesde.value);
+    if (fechaHasta.value) lista = lista.filter((a) => (a.Fecha || "") <= fechaHasta.value);
+
+    return lista;
+  }
+
+  // ---------- Render lista ----------
+  function renderLista() {
+    const lista = avisosFiltrados();
+    filterCount.textContent = `${lista.length} aviso${lista.length === 1 ? "" : "s"}`;
+
+    if (lista.length === 0) {
+      listaAvisos.innerHTML = `<div class="empty-state">No hay avisos que mostrar en este filtro.</div>`;
+      return;
+    }
+
+    listaAvisos.innerHTML = "";
+    lista.forEach((aviso) => listaAvisos.appendChild(renderCard(aviso)));
+  }
+
+  function renderCard(aviso) {
+    const resuelto = aviso.Estado === "Resuelto";
+
+    const card = document.createElement("div");
+    card.className = `aviso-card ${resuelto ? "resuelto" : "pendiente"}`;
+
+    const fotos = (aviso.Fotos || "").split(",").map((f) => f.trim()).filter(Boolean);
+    const fotosHtml = fotos.length
+      ? `<div class="aviso-fotos">${fotos
+          .map((url, i) => `<a href="${url}" target="_blank" rel="noopener">Ver foto ${i + 1}</a>`)
+          .join("")}</div>`
+      : "";
+
+    const fotosSolucion = (aviso.FotosSolucion || "").split(",").map((f) => f.trim()).filter(Boolean);
+    const fotosSolucionHtml = fotosSolucion.length
+      ? `<div class="aviso-fotos">${fotosSolucion
+          .map((url, i) => `<a href="${url}" target="_blank" rel="noopener">Evidencia solución ${i + 1}</a>`)
+          .join("")}</div>`
+      : "";
+
+    card.innerHTML = `
+      <div class="aviso-head">
+        <div>
+          <div class="aviso-folio">${aviso.Folio || "—"} · ${aviso.Fecha || "—"}</div>
+          <div class="aviso-lugar">${aviso.Lugar || "Sin lugar"}</div>
+        </div>
+        <span class="badge ${resuelto ? "resuelto" : "pendiente"}">${resuelto ? "Resuelto" : "Pendiente"}</span>
+      </div>
+      <div class="aviso-meta">
+        <span><b>Solicitante:</b> ${aviso.Solicitante || "—"}</span>
+        <span><b>Técnico(s):</b> ${aviso.Especialidad || "—"}</span>
+        <span><b>Tipo:</b> ${aviso.TipoMantenimiento || "—"}</span>
+        <span><b>Prioridad:</b> ${aviso.Prioridad || "—"}</span>
+      </div>
+      <div class="aviso-desc">${aviso.Descripcion || ""}</div>
+      ${fotosHtml}
+      ${fotosSolucionHtml}
+      <div class="aviso-actions">
+        <button type="button" class="btn-toggle ${resuelto ? "" : "resolver"}">
+          ${resuelto ? "Reabrir aviso" : "Marcar como resuelto"}
+        </button>
+      </div>
+      <div class="confirm-panel" style="display:none;"></div>
+    `;
+
+    card.querySelector(".btn-toggle").addEventListener("click", (e) =>
+      abrirPanelConfirmacion(card, aviso, resuelto ? "Pendiente" : "Resuelto")
+    );
+
+    return card;
+  }
+
+  // ---------- Panel de confirmación (clave + evidencia) ----------
+  function abrirPanelConfirmacion(card, aviso, nuevoEstado) {
+    const requierePhotoEvidencia = nuevoEstado === "Resuelto";
+    const panel = card.querySelector(".confirm-panel");
+    const actionsBtn = card.querySelector(".btn-toggle");
+
+    let evidencia = []; // { dataUrl, name }
+
+    panel.innerHTML = `
+      <label for="clave-${aviso.Folio}">Clave de mantenimiento</label>
+      <input type="password" id="clave-${aviso.Folio}" autocomplete="off" placeholder="Ingresa la clave del área">
+
+      ${requierePhotoEvidencia ? `
+        <label>Foto de evidencia de la solución</label>
+        <label class="photo-input-mini" id="photoMini-${aviso.Folio}">
+          Toca para tomar o subir la foto
+          <input type="file" accept="image/*" multiple>
+        </label>
+        <div class="confirm-preview" id="preview-${aviso.Folio}"></div>
+      ` : ""}
+
+      <div class="confirm-error" id="error-${aviso.Folio}" style="display:none;"></div>
+      <div class="confirm-actions">
+        <button type="button" class="btn-cancel">Cancelar</button>
+        <button type="button" class="btn-confirm">Confirmar</button>
+      </div>
+    `;
+    panel.style.display = "block";
+    actionsBtn.style.display = "none";
+
+    const errorBox = panel.querySelector(`#error-${cssEscape(aviso.Folio)}`);
+    const claveInput = panel.querySelector(`#clave-${cssEscape(aviso.Folio)}`);
+
+    if (requierePhotoEvidencia) {
+      const fileInput = panel.querySelector(`#photoMini-${cssEscape(aviso.Folio)} input`);
+      const miniLabel = panel.querySelector(`#photoMini-${cssEscape(aviso.Folio)}`);
+      const previewBox = panel.querySelector(`#preview-${cssEscape(aviso.Folio)}`);
+
+      fileInput.addEventListener("change", async () => {
+        const files = Array.from(fileInput.files || []);
+        for (const file of files) {
+          try {
+            const dataUrl = await comprimirImagen(file);
+            evidencia.push({ dataUrl, name: file.name });
+          } catch (err) {
+            console.error(err);
+          }
+        }
+        fileInput.value = "";
+        previewBox.innerHTML = evidencia
+          .map((f) => `<div class="thumb-mini"><img src="${f.dataUrl}" alt="${f.name}"></div>`)
+          .join("");
+        miniLabel.classList.toggle("has-photos", evidencia.length > 0);
+        miniLabel.firstChild.textContent =
+          evidencia.length > 0 ? `${evidencia.length} foto(s) lista(s) — toca para agregar más` : "Toca para tomar o subir la foto";
+      });
+    }
+
+    panel.querySelector(".btn-cancel").addEventListener("click", () => {
+      panel.style.display = "none";
+      panel.innerHTML = "";
+      actionsBtn.style.display = "";
+    });
+
+    panel.querySelector(".btn-confirm").addEventListener("click", async () => {
+      errorBox.style.display = "none";
+      const clave = claveInput.value.trim();
+
+      if (!clave) {
+        errorBox.textContent = "Ingresa la clave de mantenimiento para continuar.";
+        errorBox.style.display = "block";
+        return;
+      }
+      if (requierePhotoEvidencia && evidencia.length === 0) {
+        errorBox.textContent = "Se requiere al menos una foto de evidencia de la solución.";
+        errorBox.style.display = "block";
+        return;
+      }
+
+      const confirmBtn = panel.querySelector(".btn-confirm");
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = "Guardando…";
+
+      try {
+        const res = await fetch(CONFIG.APPS_SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "actualizar",
+            folio: aviso.Folio,
+            estado: nuevoEstado,
+            clave,
+            evidencia: evidencia.map((f) => ({ nombre: f.name, dataUrl: f.dataUrl }))
+          })
+        });
+
+        if (!res.ok) throw new Error(`El servidor respondió con estado ${res.status}`);
+        const data = await res.json();
+
+        if (data.status !== "ok") {
+          errorBox.textContent =
+            data.message === "Clave incorrecta"
+              ? "Clave incorrecta. Solo el personal de mantenimiento puede cambiar el estado."
+              : (data.message || "No se pudo guardar el cambio.");
+          errorBox.style.display = "block";
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = "Confirmar";
+          return;
+        }
+
+        aviso.Estado = nuevoEstado;
+        panel.style.display = "none";
+        panel.innerHTML = "";
+        renderLista();
+
+        try {
+          localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(avisos));
+        } catch (err) {
+          console.error("No se pudo actualizar la caché local:", err);
+        }
+      } catch (err) {
+        console.error(err);
+        errorBox.textContent = "No se pudo guardar el cambio. Revisa tu conexión e intenta de nuevo.";
+        errorBox.style.display = "block";
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = "Confirmar";
+      }
+    });
+  }
+
+  function cssEscape(str) {
+    return String(str).replace(/[^a-zA-Z0-9_-]/g, "\\$&");
+  }
+
+  // ---------- Compresión de imágenes (evidencia) ----------
+  function comprimirImagen(file) {
+    const maxW = (window.CONFIG && CONFIG.MAX_PHOTO_WIDTH) || 1280;
+    const quality = (window.CONFIG && CONFIG.PHOTO_QUALITY) || 0.75;
+
+    if (window.createImageBitmap) {
+      return createImageBitmap(file, { resizeWidth: maxW, resizeQuality: "low" })
+        .then((bitmap) => {
+          const canvas = document.createElement("canvas");
+          canvas.width = bitmap.width;
+          canvas.height = bitmap.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(bitmap, 0, 0);
+          if (bitmap.close) bitmap.close();
+          return canvasABase64(canvas, quality);
+        })
+        .catch(() => comprimirImagenFallback(file, maxW, quality));
+    }
+
+    return comprimirImagenFallback(file, maxW, quality);
+  }
+
+  function canvasABase64(canvas, quality) {
+    return new Promise((resolve, reject) => {
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) { reject(new Error("No se pudo comprimir la imagen")); return; }
+          const reader = new FileReader();
+          reader.onerror = () => reject(new Error("No se pudo leer la imagen comprimida"));
+          reader.onload = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        },
+        "image/jpeg",
+        quality
+      );
+    });
+  }
+
+  function comprimirImagenFallback(file, maxW, quality) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error("No se pudo leer la imagen"));
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onerror = () => reject(new Error("No se pudo procesar la imagen"));
+        img.onload = () => {
+          const scale = Math.min(1, maxW / img.width);
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          canvasABase64(canvas, quality).then(resolve).catch(reject);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+})();
+
+</script>
 </body>
 </html>
